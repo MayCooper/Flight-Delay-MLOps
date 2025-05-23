@@ -1,0 +1,78 @@
+# ------------------------------------------------------------------------------
+# Author: May Cooper
+# Script: activate.sh
+#
+# This script activates a Python virtual environment by updating relevant shell
+# variables (PATH, PS1, PYTHONHOME) and preserving any prior state for clean
+# deactivation. Supports both Unix and Windows-like environments (MSYS/Cygwin).
+# ------------------------------------------------------------------------------
+
+deactivate () {
+    # Restore the previous PATH if it was modified
+    if [ -n "${_OLD_VIRTUAL_PATH:-}" ]; then
+        PATH="${_OLD_VIRTUAL_PATH}"
+        export PATH
+        unset _OLD_VIRTUAL_PATH
+    fi
+
+    # Reinstate original PYTHONHOME if it was set before activation
+    if [ -n "${_OLD_VIRTUAL_PYTHONHOME:-}" ]; then
+        PYTHONHOME="${_OLD_VIRTUAL_PYTHONHOME}"
+        export PYTHONHOME
+        unset _OLD_VIRTUAL_PYTHONHOME
+    fi
+
+    # Refresh the shell's command cache
+    hash -r 2> /dev/null
+
+    # Reset the prompt to its original value, if changed
+    if [ -n "${_OLD_VIRTUAL_PS1:-}" ]; then
+        PS1="${_OLD_VIRTUAL_PS1}"
+        export PS1
+        unset _OLD_VIRTUAL_PS1
+    fi
+
+    # Unset environment-specific flags
+    unset VIRTUAL_ENV
+    unset VIRTUAL_ENV_PROMPT
+
+    # Remove this deactivate function unless called in "nondestructive" mode
+    if [ ! "${1:-}" = "nondestructive" ]; then
+        unset -f deactivate
+    fi
+}
+
+# Clear out any existing virtual environment settings
+deactivate nondestructive
+
+# Determine and normalize the path to the virtual environment
+if [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ]; then
+    # Convert Windows path to POSIX-style for MSYS or Cygwin compatibility
+    export VIRTUAL_ENV=$(cygpath "/path/to/your/airline_api_env")
+else
+    # Use the path as-is for standard Unix/Linux environments
+    export VIRTUAL_ENV="/path/to/your/airline_api_env"
+fi
+
+# Save current PATH and prepend virtual environment Scripts folder
+_OLD_VIRTUAL_PATH="$PATH"
+PATH="$VIRTUAL_ENV/Scripts:$PATH"
+export PATH
+
+# Temporarily unset PYTHONHOME to avoid conflicts
+if [ -n "${PYTHONHOME:-}" ]; then
+    _OLD_VIRTUAL_PYTHONHOME="${PYTHONHOME}"
+    unset PYTHONHOME
+fi
+
+# Update shell prompt to reflect active environment
+if [ -z "${VIRTUAL_ENV_DISABLE_PROMPT:-}" ]; then
+    _OLD_VIRTUAL_PS1="${PS1:-}"
+    PS1="(airline_api_env) ${PS1:-}"
+    export PS1
+    VIRTUAL_ENV_PROMPT="(airline_api_env) "
+    export VIRTUAL_ENV_PROMPT
+fi
+
+# Rebuild the command cache to reflect updated PATH
+hash -r 2> /dev/null

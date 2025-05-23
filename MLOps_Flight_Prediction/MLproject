@@ -1,0 +1,35 @@
+name: airport-delay-pipeline
+
+conda_env: pipeline_env.yaml
+
+entry_points:
+  import_data:
+    parameters:
+      raw_data_file:
+        type: str
+        description: "Path to the raw data file to be imported and formatted."
+    command: "python D600/Scripts/data_import.py {raw_data_file}"
+
+  clean_data:
+    parameters:
+      formatted_data_file:
+        type: path
+        description: "Path to the formatted data file to be cleaned and filtered."
+    command: "python D600/Scripts/filter_clean_data.py {formatted_data_file}"
+
+  poly_regressor:
+    parameters:
+      cleaned_data_file:
+        type: path
+        description: "Path to the cleaned data file for training the regression model."
+    command: "python poly_regressor_Python_1.0.0.py --cleaned_data_file {cleaned_data_file}"
+
+  main:
+    parameters:
+      raw_data_file:
+        type: str
+        description: "Path to the raw data file to initiate the pipeline."
+    command: >
+      mlflow run . -e import_data -P raw_data_file={raw_data_file} &&
+      mlflow run . -e clean_data -P formatted_data_file=D600/Scripts/formatted_T_ONTIME_REPORTING.csv &&
+      mlflow run . -e poly_regressor -P cleaned_data_file=cleaned_data.csv
